@@ -17,14 +17,28 @@ impl alpha h' (x, t)
 
 implFast alpha = arrayMemoFix ((0 :: Int, 0 :: Int), (?nx, ?nt)) (impl alpha)
 
+outputLatex = let implTex = let ?nx = mathit $ fromString "nx"
+                                ?dx = deltau <> (fromString "x")
+                                ?dt = deltau <> (fromString "t") 
+                            in fixLatexCases "h" (impl alpha)
+                                   [(0, fromString "t"), 
+                                    (?nx, fromString "t"),
+                                    (fromString "x", 0),
+                                    (fromString "x", fromString "t")]
+                  --specTex = toLatex (spec (varconst "alpha") undefined) -- (implFast alpha))) 
+              in do doLatex implTex "heat-impl"
+                    --doLatex specTex "heat-model"
 
-experiment = let ?dx = 0.05 in
-             let ?dt = 0.05 :: Float in
-             let ?nx = 40 :: Int in
-             let ?nt = 20 :: Int  in
-             let ?name = "h" in 
+experiment = let ?dx = 0.05 
+                 ?dt = 0.05 :: Float
+                 ?nx = 40   :: Int
+                 ?nt = 20   :: Int
+                 ?name = "h" in 
+
              let alpha = 0.006 
-                 spec' = spec (constant alpha) (implFast alpha)
+                 spec' = let ?nx = ?nx :: Int
+                             ?nt = ?nt :: Int
+                         in spec (constant alpha) (implFast alpha)
                  f     = check spec'
 
                  outputFun (x, t) = putStrLn $ "x = " ++ (show x) ++ " t = " ++ (show t)
@@ -33,15 +47,16 @@ experiment = let ?dx = 0.05 in
                  figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
 
                                                   
-             in do dat <- mapM outputFun [(0,0)..(?nx-2,?nt-1)]
-                   doLatex  (toLatex (spec (varconst "alpha") (implFast alpha))) ?name
+             in ()  -- do --dat <- mapM outputFun [(0,0)..(?nx-2,?nt-1)]
+
                    --putStrLn $ (toString $ lhs spec')
                    --putStrLn $ (toString $ rhs spec')
+
                    --plotX11 figure
                    --plotX11 (figureEqn (toString $ lhs spec') (curry $ fst . f)) 
                    --plotX11 (figureEqn (toString $ rhs spec') (curry $ snd . f)) 
                    --plotX11 (figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t) )) 
-                   return ()
+                   --return ()
 
 
 experimentCSV fname = let ?dx = 0.05 in
@@ -65,4 +80,3 @@ model_obj =
              let alpha = 0.006
                  m = Model (spec (Constant alpha Nothing)) (implFast alpha)
              in m
-             

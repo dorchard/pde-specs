@@ -2,6 +2,9 @@
 
 module PDESpec(module Solvers, module Types, module PDESpec, module Output, module Text.CSV, module GHC.Arr) where
 
+import System.Environment
+import System.Exit
+
 import Output
 import Solvers
 import Types

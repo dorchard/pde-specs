@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs, ImplicitParams #-}
 
 module Output (module Text.LaTeX.Packages.AMSMath, 
+               module Text.LaTeX.Base,
                module Text.LaTeX.Base.Render,
                module Output) where
 
@@ -88,7 +89,7 @@ fixLatexD recName delim f = \(x, y) -> delim ((fromString recName) ^: x !: y) (f
 fixLatexCases recName f cases = align $ map (fixLatexD recName (&) f) cases
 
 doLatex eqn name = renderFile (name ++ ".tex") (wrapped eqn)
-                    where wrapped eqn = (documentclass [] article) <> usepackage [] "amsmath" <> (document (align [eqn])) -- (equiv (mathit $ fromString name) eqn)))
+                    where wrapped eqn = (documentclass [] article) <> usepackage [] "amsmath" <> (document eqn) -- (equiv (mathit $ fromString name) eqn)))
 
 writeLatexFigure eqn figname name = 
        renderFile name ((documentclass [] article) 
