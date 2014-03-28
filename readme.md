@@ -5,19 +5,19 @@ Compile
 
 Requires 'array-memoize' library: 
 
-  git clone http://github.com/dorchard/array-memoize
+  	 git clone http://github.com/dorchard/array-memoize
 
-  cd array-memoize
+	 cd array-memoize
 
-  cabal configure
+	 cabal configure
 
-  cabal build
+  	 cabal build
 
-  sudo cabal install
+  	 sudo cabal install
 
 Then build via
 
-  ghc TestCase.hs -o testcase
+     	 ghc TestCase.hs -o testcase
 
 Usage
 ---------------------------------------------
