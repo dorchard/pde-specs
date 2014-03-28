@@ -1,13 +1,18 @@
 {-# LANGUAGE Rank2Types, TypeOperators, MultiParamTypeClasses, ExistentialQuantification, GADTs, UndecidableInstances, ConstraintKinds, NoMonomorphismRestriction, ImplicitParams #-}
 
-module PDESpec(module Solvers, module Types, module PDESpec, module Output, module Text.CSV, module GHC.Arr) where
+module PDESpec(module Solvers, module Types, module PDESpec, module Output, module Text.CSV, module GHC.Arr,
+ module System.Environment, module Plot, module Data.Function.ArrayMemoize, module Debug.Trace, module Data.Text) where
 
 import System.Environment
 import System.Exit
+import Debug.Trace
 
 import Output
 import Solvers
 import Types
+import Plot
+import Data.Text (unpack)
+import Data.Function.ArrayMemoize
 import Text.CSV
 
 import GHC.Arr
@@ -64,3 +69,17 @@ buildModelInterface name model =
        
 type Index ds a = (Show a, Ix a, Enum a, DeltaMap a ds)
 
+data Solution ds t a = Solution { dimension :: ds, 
+                                  solution  :: (t -> a),
+                                  cases     :: [Indices ds LaTeX]}
+
+class MkFigure t ds where
+    mkFigure :: (DeltaMap a ds) => String -> Solution ds t a -> Spec ds (t -> a) -> (t -> a) -> IO ()
+
+{- 
+instance (?nx :: x, ?nt :: t) => MkFigure (x, t) (X :. T :. Nil) where
+    mkFigure names sol = let ?nx = mathit $ fromString "nx"
+                         -- ?nt = mathit $ fromString "nt"
+                             ?dx = deltau <> (fromString "x")
+                             ?dt = deltau <> (fromString "t") 
+                         in  -}

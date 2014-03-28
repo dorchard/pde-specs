@@ -36,7 +36,7 @@ plot3d dx dy (sx, nx) (sy, ny) xlabel ylabel zlabel fun =
 
 writePlot p fname = plot (PS.color (PS.eps (PS.cons fname))) p
 
-writePlotPNG p fname = plot (PNG.cons fname) p
+writePlotPNG p fname = plot (PNG.cons (fname ++ ".png")) p
 
 plotX11 g = plot (X11.cons) g
 
