@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs, ImplicitParams #-}
 
-module LaTeX (module Text.LaTeX.Packages.AMSMath, module LaTeX) where
+module Output (module Text.LaTeX.Packages.AMSMath, module Output) where
 
 {- (<>), fromString, LaTeX(..),alpha,deltau,fixLatex,fixLatexCases,doLatex,writeLatexFigure,mathit) where -}
 
@@ -12,12 +12,14 @@ import Text.LaTeX.Base.Render
 import Data.Text hiding (map)
 import Types
 
+
 specToLatex (Equality e1 e2 _) = (eqnToLatex e2) `equiv` (eqnToLatex e2)
 
-class EqnLatex t where
+class EqnShow t where
     eqnToLatex :: (?name :: String) => t -> LaTeX
+    eqnToString :: (?name :: String) => t -> String
 
-instance (Show a, Fractional a) => EqnLatex (Eqn ds (t -> a)) where
+instance (Show a, Fractional a) => EqnShow (Eqn ds (t -> a)) where
     eqnToLatex (Delta n _ d) = ((delta ^: (fromInteger n)) <> (fromString ?name)) 
                            `frac` 
                            ((delta <> (fromString $ show d)) ^: (fromInteger n))
@@ -27,6 +29,7 @@ instance (Show a, Fractional a) => EqnLatex (Eqn ds (t -> a)) where
     eqnToLatex (Divide e1 e2) = (eqnToLatex e1) `frac` (eqnToLatex e2)
 --eqnToLatex (Abs e1) = (eqnToLatex e1)
     eqnToLatex (Constant e1) = (fromString $ show e1)
+
 
 
 
