@@ -5,7 +5,7 @@ module PDESpec(module Solvers, module Types, module PDESpec, module LaTeX) where
 import LaTeX
 import Solvers
 import Types
-
+import Text.CSV
 
 {- Aliases to make writing specifications nicer -}
 
@@ -18,7 +18,7 @@ d     = Delta 1
 d2    = Delta 2
 d3    = Delta 3 
 
-{- Other helpers -}
+{- Helpers -}
 
 type Unfix t = t -> t -- The type of an 'unfixed' function
 

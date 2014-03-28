@@ -1,8 +1,8 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs #-}
 
-module LaTeX((<>), fromString, LaTeX(..),alpha,deltau,fixLatex,fixLatexCases,doLatex,writeLatexFigure,mathit) where
+module LaTeX (module Text.LaTeX.Packages.AMSMath, module LaTeX) where
 
---import Prelude hiding (Bool)
+{- (<>), fromString, LaTeX(..),alpha,deltau,fixLatex,fixLatexCases,doLatex,writeLatexFigure,mathit) where -}
 
 import Text.LaTeX.Base hiding (alph)
 import Text.LaTeX.Packages.AMSMath 
@@ -10,51 +10,21 @@ import Text.LaTeX.Packages.Graphicx
 import Text.LaTeX.Base.Render
 
 import Data.Text hiding (map)
+import Types
 
--- type Bool = Latex
+specToLatex (Equality e1 e2 _) = (eqnToLatex e2) `equiv` (eqnToLatex e2)
+
+eqnToLatex (Delta n _ d) = undefined
+
 
 {- Some stuff missing from LaTeX package -}
 
 instance Ord LaTeX where
 
-{- instance Ord LaTeX where
-    x <= y = (read . unpack . render $ x) <= (read . unpack . render $ y) -}
-
--- B (x <> (fromString "\\leq") <> y)
-
 instance Real LaTeX where
     
 instance RealFrac LaTeX where
 
-{- 
-data Lift s a = L a LaTeX
-
-class Unlift s a where
-      unlift :: Lift s a -> s
-      lifte :: s -> Lift s a
-instance Unlift LaTeX a where
-      unlift (L _ x) = x
-      lifte x = L undefined x
-instance Unlift Float Float where
-      unlift (L x _) = x
-      lifte x = L x undefined
-
-(<|>) :: a -> LaTeX -> Lift s a
-x <|> t = L x t
-
-instance (Ord a, Ord s, Unlift s a) => Ord (Lift s a) where
-  x <= y = (unlift x) <= (unlift y) 
-instance (Show a, Num a, Num s, Unlift s a) => Num (Lift s a) where
-    a + b = lifte $ (unlift a) + (unlift b)
-    a * b = lifte $ (unlift a) * (unlift b)
-    a - b = lifte $ (unlift a) - (unlift b)
-    fromInteger x = L (fromInteger x) (fromString $ show x)
-instance (Show a, Fractional a, Fractional s, Unlift s a) => Fractional (Lift s a) where
-    a / b = lifte $ (unlift a) / (unlift b)
-instance (Eq s, Eq a, Unlift s a) => Eq (Lift s a) where
-    a == b = (unlift a) == (unlift b)
-
--}
 
 {- LaTeX fixed point #-}
     
