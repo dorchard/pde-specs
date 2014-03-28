@@ -6,9 +6,13 @@ Compile
 Requires 'array-memoize' library: 
 
   git clone http://github.com/dorchard/array-memoize
+
   cd array-memoize
+
   cabal configure
+
   cabal build
+
   sudo cabal install
 
 Then build via
