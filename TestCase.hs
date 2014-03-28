@@ -3,6 +3,8 @@ import Data.Function.ArrayMemoize
 
 -- d h / d t = a * (d^2 h / d x^2) 
 
+import Debug.Trace
+
 data Dimensions = X | Y | Z | T deriving Show
 
 data Spec a = Delta Int Dimensions | Equality (Spec a) (Spec a) | Times (Spec a) (Spec a) | Constant Float
@@ -35,7 +37,7 @@ impl dx dt nx nt a =
               | t == 0  = 0
               | otherwise =  h' (x, t-1) + r * (h' (x+1, t-1) - 2 * h' (x, t-1) + h' (x-1, t-1))
             r = a * (dt / (dx*dx))
-         in arrayMemoFix ((0, 0), (nx, nt)) h
+         in ("r = " ++ show r) `trace` arrayMemoFix ((0, 0), (nx, nt)) h
 
 implA dx dt nx nt a = impl dx dt nx nt a
 
@@ -52,7 +54,7 @@ check' dx dt  (Times (Constant a) s) impl = \(x,t) -> a * impl (x,t)
 
 check dx dt  (Equality s1 s2) impl = \(x,t) -> (check' dx dt s1 impl (x,t), check' dx dt s2 impl (x,t))
 
-euler dx dt d h = localEuler dx dt X h
+euler dx dt d h = localEuler dx dt d h
 
 localEuler dx dt X h (x, t) = (h (x + 1, t) - h (x, t)) / dx
 localEuler dx dt T h (x, t) = (h (x, t + 1) - h (x, t)) / dt
