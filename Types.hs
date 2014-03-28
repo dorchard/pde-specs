@@ -27,6 +27,10 @@ type instance Delta Y a = ?dy :: a
 type instance Delta Z a = ?dz :: a
 type instance Delta T a = ?dt :: a
 
+type family DeltaMap a ds :: Constraint
+type instance DeltaMap a Nil = ()
+type instance DeltaMap a (d :. ds) = (Delta d a, DeltaMap a ds)
+
 deriving instance Show (Dim t)
 
 data Nil
@@ -70,7 +74,7 @@ data Eqn ds a where
     Minus :: Eqn ds a -> Eqn ds a -> Eqn ds a
     Divide :: Eqn ds a -> Eqn ds a -> Eqn ds a
     Abs :: Eqn ds a -> Eqn ds a
-    Constant :: ((Show a) => a) -> Eqn ds (t -> a)
+    Constant :: ((Show a) => a) -> Maybe String -> Eqn ds (t -> a)
              
 instance (Show a) => Show (Eqn ds (t -> a)) where
     show (Delta n _ dim) = "Delta " ++ (show n) ++ " " ++ (show dim) ++ " fun "
@@ -79,7 +83,8 @@ instance (Show a) => Show (Eqn ds (t -> a)) where
     show (Minus e1 e2)   = "Minus (" ++ show e1 ++ ") (" ++  show e2 ++ ")"
     show (Divide e1 e2)  = "Divide (" ++ show e1 ++ ") (" ++  show e2 ++ ")"
     show (Abs e)         = "Abs (" ++ show e ++ ")"
-    show (Constant a)    = "Constant " ++ show a 
+    show (Constant a Nothing) = "Constant " ++ show a 
+    show (Constant a (Just x)) = "Constant " ++ x
 
 -- Specification type (currently just one equality)
 -- TODO: could be more in the future
@@ -101,7 +106,7 @@ instance Num a => Num (Eqn ds (t -> a)) where
     a - b = Minus a b
     abs a = Abs a
     signum a = error "signum not implemented"
-    fromInteger a = Constant (fromInteger a)
+    fromInteger a = Constant (fromInteger a) Nothing
 
 instance Fractional a => Fractional (Eqn ds (t -> a)) where
-    fromRational x = Constant (fromRational x)
+    fromRational x = Constant (fromRational x) Nothing

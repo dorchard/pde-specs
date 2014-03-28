@@ -1,11 +1,13 @@
 {-# LANGUAGE Rank2Types, TypeOperators, MultiParamTypeClasses, ExistentialQuantification, GADTs, UndecidableInstances, ConstraintKinds, NoMonomorphismRestriction, ImplicitParams #-}
 
-module PDESpec(module Solvers, module Types, module PDESpec, module Output, module Text.CSV) where
+module PDESpec(module Solvers, module Types, module PDESpec, module Output, module Text.CSV, module GHC.Arr) where
 
 import Output
 import Solvers
 import Types
 import Text.CSV
+
+import GHC.Arr
 
 {- Aliases to make writing specifications nicer -}
 
@@ -17,6 +19,9 @@ withDomain = ($)
 d     = Delta 1
 d2    = Delta 2
 d3    = Delta 3 
+
+constant x = Constant x Nothing
+varconst x = Constant undefined (Just x)
 
 {- Helpers -}
 
@@ -33,7 +38,7 @@ class Check ds t a where
 
 instance (?dx :: Float, ?dt :: Float) => Check (X :. T :. Nil) (Int, Int) Float where
     check (Equality e1 e2 ds) = \(x,t) -> (checkEqn ds e1 (x, t), checkEqn ds e2 (x, t))
-    checkEqn ds (Constant a)       = \(x, t) -> a
+    checkEqn ds (Constant a _)     = \(x, t) -> a
     checkEqn ds (Delta n impl dim) = (iterate (euler dim ds) impl) !! (fromInteger n)
     checkEqn ds (Times e1 e2)      = \(x, t) -> checkEqn ds e1 (x, t) * checkEqn ds e2 (x, t)
     checkEqn ds (Add e1 e2)        = \(x, t) -> checkEqn ds e1 (x, t) + checkEqn ds e2 (x, t)
@@ -54,3 +59,5 @@ buildModelInterface name model =
          "validate" -> return ()
          "figure"   -> return ()
        
+type Index ds a = (Show a, Ix a, Enum a, DeltaMap a ds)
+
