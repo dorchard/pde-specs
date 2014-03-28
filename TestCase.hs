@@ -37,6 +37,19 @@ experiment = let ?dx = 0.05 in
              in do mapM_ outputFun [(0,0)..(?nx-2,?nt-1)]
                    plotX11 figure
 
+experimentCSV fname = let ?dx = 0.05 in
+                      let ?dt = 0.05 in
+                      let ?nx = 20  in
+                      let ?nt = 50  in
+                      let alpha = 0.006
+                          f = check (spec (Constant alpha) (impl alpha))
+                          outputRow (x, t) = [show x, show t, show . fst $ f (x, t), show . snd $ f (x, t)]
+                          csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
+
+                      in writeFile fname (printCSV csv)
+                   
+
+
 model_obj :: Model (X :. T :. Nil) ((Int, Int) -> Float)
 model_obj = 
              let ?dx = 0.05 in

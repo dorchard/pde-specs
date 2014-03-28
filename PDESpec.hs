@@ -1,6 +1,6 @@
 {-# LANGUAGE Rank2Types, TypeOperators, MultiParamTypeClasses, ExistentialQuantification, GADTs, UndecidableInstances, ConstraintKinds, NoMonomorphismRestriction, ImplicitParams #-}
 
-module PDESpec(module Solvers, module Types, module PDESpec, module LaTeX) where
+module PDESpec(module Solvers, module Types, module PDESpec, module LaTeX, module Text.CSV) where
 
 import LaTeX
 import Solvers
