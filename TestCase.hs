@@ -2,7 +2,11 @@
 
 import PDESpec
 
+-- Example specification 
+
 spec alpha h = ((d h T) === (alpha * d2 h X))  `withDomain`   (X :. T :. Nil)
+
+-- Example FCTS implementation
 
 impl alpha h' (x, t)
     | x == 0    = 1
@@ -11,125 +15,48 @@ impl alpha h' (x, t)
     | otherwise = h' (x, t-1) + r * (h' (x+1, t-1) - 2 * h' (x, t-1) + h' (x-1, t-1))
                    where r = alpha * (?dt / (?dx * ?dx))
 
+-- Make it fast please Mrs. Haskell:
+-- implFast :: Float -> (Int, Int) -> Float
 implFast alpha = arrayMemoFix ((0 :: Int, 0 :: Int), (?nx, ?nt)) (impl alpha)
 
-output = let ?dx = 0.05 
-             ?dt = 0.05 :: Float
-             ?nx = 40   :: Int
-             ?nt = 20   :: Int
-             ?name = "h"
-         in undefined
-           
+-- Build experiment with various choices of output
 
-
-
-outputLatex = let implTex = let ?nx = mathit $ fromString "nx"
-                                ?dx = deltau <> (fromString "x")
-                                ?dt = deltau <> (fromString "t") 
-                            in fixLatexCases "h" (impl alpha)
-                                   [(0, fromString "t"), 
-                                    (?nx, fromString "t"),
-                                    (fromString "x", 0),
-                                    (fromString "x", fromString "t")]
-                  specTex = let ?name = "h"
-                                ?dx = undefined
-                                ?dt = undefined
-                            in toLatex (spec (varconst "alpha") (undefined::(Int, Int) -> Float))
-              in doLatex (noindent <> fromString "Abstract specification : " <>
-                           equation specTex                    <> 
-                          fromString "Discrete approximation : " <>
-                           implTex) "heat"
-
-experiment = let ?dx = 0.05 
+experiment action = 
+             let ?dx = 0.05 
                  ?dt = 0.05 :: Float
-                 ?nx = 40   :: Int
-                 ?nt = 20   :: Int
+                 ?nx = 100   :: Int
+                 ?nt = 100   :: Int
                  ?name = "h" in 
 
              let alpha = 0.006 
-                 spec' = let ?nx = ?nx :: Int
-                             ?nt = ?nt :: Int
-                         in spec (constant alpha) (implFast alpha)
-                 f     = check spec'
+                 spec' = spec (constant alpha)
 
-                 outputFun (x, t) = putStrLn $ "x = " ++ (show x) ++ " t = " ++ (show t)
-                                    ++ " results = " ++ (show $ f (x,t))
-                 figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
-
-                 dat = map outputFun [(0,0)..(?nx-2,?nt-1)]
-
-                 heatImpl = plot3d' 1 1 (0, ?nx) (0, ?nt) (show X) (show T) (?name) (curry (implFast alpha))
-                 heatLHS = figureEqn (toString $ lhs spec') (curry $ fst . f)
-                 heatRHS = figureEqn (toString $ rhs spec') (curry $ snd . f)
-                 heatErr = figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t))
-                                                  
-             in do plotX11 heatImpl
-                   plotX11 heatLHS
-                   plotX11 heatRHS
-                   plotX11 heatErr
-                   
-                   writePlotPNG heatImpl "heatImpl"
-                   writePlotPNG heatLHS  "heatLHS"
-                   writePlotPNG heatRHS  "heatRHS"
-                   writePlotPNG heatErr  "heatErr"
-
-experimentCSV fname = let ?dx = 0.05 in
-                      let ?dt = 0.05 :: Float in
-                      let ?nx = 20 :: Int in
-                      let ?nt = 50 :: Int in
-                      let alpha = 0.006
-                          f = check (spec (constant alpha) (implFast alpha))
-                          outputRow (x, t) = [show x, show t, show . fst $ f (x, t), show . snd $ f (x, t)]
-                          csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
-
-                      in writeFile fname (printCSV csv)
-
-
-model_obj :: Model (X :. T :. Nil) ((Int, Int) -> Float)
-model_obj = 
-             let ?dx = 0.05 in
-             let ?dt = 0.05 in
-             let ?nx = 40  :: Int in
-             let ?nt = 500 :: Int in
-             let alpha = 0.006
-                 m = Model (spec (Constant alpha Nothing)) (implFast alpha)
-             in m
-
-main = do args <- getArgs
-          let ?dx = read $ args !! 0 :: Float
-              ?dt = read $ args !! 1 :: Float
-              ?nx = read $ args !! 2 :: Int
-              ?nt = read $ args !! 3 :: Int
-              ?name = "h"
-           in
-             let alpha = read $ args !! 4 :: Float
-
-                 spec' = spec (constant alpha) (implFast alpha)
-                 f     = check spec'
+                 results = verifyModel Euler spec' (implFast alpha)
 
                  figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
 
-                 heatImpl = plot3d' 1 1 (0, ?nx) (0, ?nt) (show X) (show T) (?name) (curry (implFast alpha))
-                 heatLHS = figureEqn (toString $ lhs spec') (curry $ fst . f)
-                 heatRHS = figureEqn (toString $ rhs spec') (curry $ snd . f)
-                 heatErr = figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t))
-                 
-                 outputRow (x, t) = [show x, show t, show . fst $ f (x, t), show . snd $ f (x, t)]
-                 csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
-                               
-             in do putStrLn "data.csv"
-                   writeFile "data.csv" (printCSV csv)
-                   putStrLn "heatImpl.png"
-                   writePlotPNG heatImpl "heatImpl"
-                   putStrLn "heatLHS.png"
-                   writePlotPNG heatLHS  "heatLHS"
-                   putStrLn "heatRHS.png"
-                   writePlotPNG heatRHS  "heatRHS"
-                   putStrLn "heatErr.png"
-                   writePlotPNG heatErr  "heatErr"
-                   outputLatexSep
+                 heatImpl = makePlot "h" (implFast alpha) 
+                 heatLHS = makePlotAdjust 2 1 (toString $ lhs $ spec' (implFast alpha)) (fst . results)
+                 heatRHS = makePlotAdjust 2 1 (toString $ rhs $ spec' (implFast alpha)) (snd . results)
+                 heatErr = makePlotAdjust 2 1 "|err|" (abs . uncurry (-) . results)
+         
+             in case action of
+                  ShowFigures -> showFigures [heatImpl, heatLHS, heatRHS, heatErr]
+                  PNGFigures  -> writePNGs [(heatImpl, "heatImpl"), 
+                                            (heatLHS, "heatLHS"),
+                                            (heatRHS, "heatRHS"),
+                                            (heatErr, "heatErr")]
+                  Latex       -> outputLatexSep --(impl alpha) -- Docs spec' impl 
+                  CSV         -> let outputRow (x, t) = let (lhs, rhs) = results (x, t)
+                                                        in [show x, show t, show (implFast alpha (x, t)), 
+                                                            show lhs, show rhs]
+                                     csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
+                                 in writeFile "data" (printCSV csv)
 
-outputLatexSep = let implTex = let ?nx = mathit $ fromString "nx"
+
+outputLatexSep = 
+                 let implTex =
+                               let ?nx = mathit $ fromString "nx"
                                    ?dx = deltau <> (fromString "x")
                                    ?dt = deltau <> (fromString "t") 
                                in fixLatexCases "h" (impl alpha)
@@ -150,5 +77,4 @@ outputLatexSep = let implTex = let ?nx = mathit $ fromString "nx"
                            equation specTex                    <> 
                           fromString "Discrete approximation : " <>
                            implTex) "heat"
-            
              

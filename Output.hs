@@ -27,6 +27,7 @@ instance (Show a) => Output ((t -> a) -> Spec ds (t -> a)) where
     toString f = case f undefined of
                        Equality e1 e2 _ -> toString e1 ++ "=" ++ toString e2
 -}
+                                           
 
 instance (Show a) => Output (Spec ds (t -> a)) where
     toLatex (Equality e1 e2 _) = (toLatex e1) `equiv` (toLatex e2)

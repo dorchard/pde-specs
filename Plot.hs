@@ -1,4 +1,4 @@
-module Plot(plotDefault,plot,writePlot,plot3d,simple2d,plotX11,plot3d',writePlotPNG) where
+module Plot(plotDefault,plot,writePlot,plot3d,simple2d,plotX11,plot3d',writePlotPNG,writePNGs,showFigures) where
 
 import Graphics.Gnuplot.Advanced 
 import qualified Graphics.Gnuplot.Terminal.X11 as X11
@@ -36,7 +36,11 @@ plot3d dx dy (sx, nx) (sy, ny) xlabel ylabel zlabel fun =
 
 writePlot p fname = plot (PS.color (PS.eps (PS.cons fname))) p
 
+writePNGs gs = mapM_ (\(p,n) -> writePlotPNG p n) gs
+
 writePlotPNG p fname = plot (PNG.cons (fname ++ ".png")) p
+
+showFigures gs = mapM_ plotX11 gs
 
 plotX11 g = plot (X11.cons) g
 

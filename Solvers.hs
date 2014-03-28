@@ -4,6 +4,8 @@ module Solvers where
 
 import Types
 
+data Solvers = Euler | RungeKutta
+
 {- Recall Euler class is (impoted from Types)
 
 class (Member d ds) => Euler t d ds where

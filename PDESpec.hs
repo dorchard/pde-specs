@@ -38,6 +38,8 @@ type Unfix t = t -> t -- The type of an 'unfixed' function
 
 {- Checking routine to compare an implementation with a spec -}
 
+verifyModel solver spec impl = check (spec impl)
+
 class Check ds t a where
     check :: Spec ds (t -> a) -> (t -> (a, a))
 
@@ -55,6 +57,12 @@ data Model ds a where
     Model :: ((Indices ds t -> a) -> (Spec ds (Indices ds t -> a)))
           -> (Indices ds t -> a) 
           -> Model ds (Indices ds t -> a)
+
+{- Plotter function -}
+
+makePlot name fun = plot3d' 1 1 (0, ?nx) (0, ?nt) (show X) (show T) name (curry fun)
+
+makePlotAdjust sx st name fun = plot3d' 1 1 (0, ?nx - sx) (0, ?nt - st) (show X) (show T) name (curry fun)
 
 buildModelInterface :: String -> Model ds a -> IO ()
 buildModelInterface name model = 
@@ -83,3 +91,30 @@ instance (?nx :: x, ?nt :: t) => MkFigure (x, t) (X :. T :. Nil) where
                              ?dx = deltau <> (fromString "x")
                              ?dt = deltau <> (fromString "t") 
                          in  -}
+
+data Action = PNGFigures | ShowFigures | Latex | CSV 
+
+{-
+outputLatexDocs spec impl  =
+                 let implTex = 
+                              let ?nx = mathit $ fromString "nx"
+                                  ?dx = deltau <> (fromString "x")
+                                  ?dt = deltau <> (fromString "t") 
+                              in fixLatexCases "h" impl [(0, fromString "t"), 
+                                                          (?nx, fromString "t"),
+                                                          (fromString "x", 0),
+                                                          (fromString "x", fromString "t")]
+                     specTex = let ?name = "h"
+                                   ?dx = undefined
+                                   ?dt = undefined
+                               in toLatex (spec (undefined::(Int, Int) -> Float))
+                 in do putStrLn "model.tex"
+                       writeFile "model.tex" (unpack . render $ specTex)
+                       putStrLn "impl.tex"
+                       writeFile "impl.tex" (unpack . render $ implTex)
+                       putStrLn "heat.tex"
+                       doLatex (noindent <> fromString "Abstract specification : " <>
+                           equation specTex                    <> 
+                          fromString "Discrete approximation : " <>
+                           implTex) "heat"
+-}
