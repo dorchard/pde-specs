@@ -1,4 +1,4 @@
-{-# LANGUAGE ImplicitParams, TemplateHaskell #-}
+{-# LANGUAGE ImplicitParams, TemplateHaskell, TypeOperators #-}
 
 import Data.Function.ArrayMemoize
 import Debug.Trace
@@ -37,4 +37,14 @@ experiment = let ?dx = 0.05 in
              in do mapM_ outputFun [(0,0)..(?nx-2,?nt-1)]
                    plotX11 figure
 
-
+model_obj :: Model (X :. T :. Nil) ((Int, Int) -> Float)
+model_obj = 
+             let ?dx = 0.05 in
+             let ?dt = 0.05 in
+             let ?nx = 40  in
+             let ?nt = 500  in
+             let alpha = 0.006
+                 m = Model (spec (Constant alpha)) (impl alpha)
+             in m
+             
+    

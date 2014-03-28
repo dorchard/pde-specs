@@ -23,6 +23,7 @@ instance Ord LaTeX where
 -- B (x <> (fromString "\\leq") <> y)
 
 instance Real LaTeX where
+    
 instance RealFrac LaTeX where
 
 {- 
