@@ -17,7 +17,7 @@ impl alpha =
               | x == ?nx = h' (x - 1, t)
               | t == 0   = 0
               | otherwise =  h' (x, t-1) + r * (h' (x+1, t-1) - 2 * h' (x, t-1) + h' (x-1, t-1))
-            r = a * (dt / (dx*dx))
+            r = alpha * (?dt / (?dx * ?dx))
          in ("r = " ++ show r) `trace` 
                arrayMemoFix ((0, 0), (?nx, ?nt)) h
 
