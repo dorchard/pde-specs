@@ -22,11 +22,11 @@ impl alpha =
                arrayMemoFix ((0, 0), (?nx, ?nt)) h
 
  
-experiment = let ?dx = 0.1 in
-             let ?dt = 0.1 in
-             let ?nx = 6  in
+experiment = let ?dx = 0.05 in
+             let ?dt = 0.05 in
+             let ?nx = 10  in
              let ?nt = 10  in
-             let alpha = 0.05 
+             let alpha = 0.006
                  f = check (spec (impl alpha) (Constant alpha))
                  outputFun (x, t) = putStrLn $ "x = " ++ (show x) ++ " t = " ++ (show t)
                                                ++ " results = " ++ (show $ f (x,t))
