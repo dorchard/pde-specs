@@ -64,7 +64,7 @@ class (Member d ds) => Euler t d ds where
     Defines an abstract syntax tree for PDEs  -}
 
 data Eqn ds a where
-    Delta :: (Euler t d ds, Member d ds, Delta d a) => Int -> (t -> a) -> (Dim d) -> Eqn ds (t -> a)
+    Delta :: (Euler t d ds, Member d ds, Delta d a) => Integer -> (t -> a) -> (Dim d) -> Eqn ds (t -> a)
     Times :: Eqn ds a -> Eqn ds a -> Eqn ds a
     Add :: Eqn ds a -> Eqn ds a -> Eqn ds a
     Minus :: Eqn ds a -> Eqn ds a -> Eqn ds a

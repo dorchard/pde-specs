@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs #-}
+{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs, ImplicitParams #-}
 
 module LaTeX (module Text.LaTeX.Packages.AMSMath, module LaTeX) where
 
@@ -14,7 +14,25 @@ import Types
 
 specToLatex (Equality e1 e2 _) = (eqnToLatex e2) `equiv` (eqnToLatex e2)
 
-eqnToLatex (Delta n _ d) = undefined
+class EqnLatex t where
+    eqnToLatex :: (?name :: String) => t -> LaTeX
+
+instance (Show a, Fractional a) => EqnLatex (Eqn ds (t -> a)) where
+    eqnToLatex (Delta n _ d) = ((delta ^: (fromInteger n)) <> (fromString ?name)) 
+                           `frac` 
+                           ((delta <> (fromString $ show d)) ^: (fromInteger n))
+    eqnToLatex (Times e1 e2) = (parensL $ eqnToLatex e1) * (parensL $ eqnToLatex e2)
+    eqnToLatex (Add e1 e2) = (eqnToLatex e1) + (eqnToLatex e2)
+    eqnToLatex (Add e1 e2) = (eqnToLatex e1) - (eqnToLatex e2)
+    eqnToLatex (Divide e1 e2) = (eqnToLatex e1) `frac` (eqnToLatex e2)
+--eqnToLatex (Abs e1) = (eqnToLatex e1)
+    eqnToLatex (Constant e1) = (fromString $ show e1)
+
+
+
+
+juxtL t1 t2 = t1 <> (fromString " ") <> t2
+parensL t = (fromString "(") <> t <> (fromString ")")
 
 
 {- Some stuff missing from LaTeX package -}

@@ -2,7 +2,7 @@
 
 module PDESpec(module Solvers, module Types, module PDESpec, module LaTeX, module Text.CSV) where
 
-import LaTeX
+import Output
 import Solvers
 import Types
 import Text.CSV
@@ -34,7 +34,7 @@ class Check ds t a where
 instance (?dx :: Float, ?dt :: Float) => Check (X :. T :. Nil) (Int, Int) Float where
     check (Equality e1 e2 ds) = \(x,t) -> (checkEqn ds e1 (x, t), checkEqn ds e2 (x, t))
     checkEqn ds (Constant a)       = \(x, t) -> a
-    checkEqn ds (Delta n impl dim) = (iterate (euler dim ds) impl) !! n
+    checkEqn ds (Delta n impl dim) = (iterate (euler dim ds) impl) !! (fromInteger n)
     checkEqn ds (Times e1 e2)      = \(x, t) -> checkEqn ds e1 (x, t) * checkEqn ds e2 (x, t)
     checkEqn ds (Add e1 e2)        = \(x, t) -> checkEqn ds e1 (x, t) + checkEqn ds e2 (x, t)
 

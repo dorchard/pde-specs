@@ -25,17 +25,21 @@ impl alpha =
 experiment = let ?dx = 0.05 in
              let ?dt = 0.05 in
              let ?nx = 40  in
-             let ?nt = 500  in
+             let ?nt = 200  in
              let alpha = 0.006
                  f = check (spec (Constant alpha) (impl alpha))
                  outputFun (x, t) = putStrLn $ "x = " ++ (show x) ++ " t = " ++ (show t)
                                                ++ " results = " ++ (show $ f (x,t))
 
                  figure = plot3d' 1 1 (0, ?nx) (0, ?nt) "x" "t" "heat" (curry (impl alpha))
+                 figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) "x" "t" axis xs
 
                                                   
-             in do mapM_ outputFun [(0,0)..(?nx-2,?nt-1)]
+             in do dat <- mapM outputFun [(0,0)..(?nx-2,?nt-1)]
                    plotX11 figure
+                   plotX11 (figureEqn "dh/dt" (curry $ fst . f)) 
+                   plotX11 (figureEqn "alpha * d^2 h / dx^2" (curry $ snd . f)) 
+                   plotX11 (figureEqn "|diff|" (\x t -> (abs . uncurry (-)) . f $ (x, t) )) 
 
 experimentCSV fname = let ?dx = 0.05 in
                       let ?dt = 0.05 in
@@ -47,8 +51,6 @@ experimentCSV fname = let ?dx = 0.05 in
                           csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
 
                       in writeFile fname (printCSV csv)
-                   
-
 
 model_obj :: Model (X :. T :. Nil) ((Int, Int) -> Float)
 model_obj = 
