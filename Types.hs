@@ -86,6 +86,10 @@ instance (Show a, Fractional a) => Show (Eqn ds (t -> a)) where
 
 data Spec ds a = Equality (Eqn ds a) (Eqn ds a) (Dimension ds) 
 
+lhs, rhs :: Spec ds a -> Eqn ds a
+lhs (Equality l _ _) = l
+rhs (Equality _ r _) = r
+
 instance (Show a, Fractional a) => Show (Spec ds (t -> a)) where
     show (Equality eq1 eq2 d) = "Equality (" ++ (show eq1) ++ ") (" ++ (show eq2) ++ " " ++ show d
 

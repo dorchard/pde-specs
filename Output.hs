@@ -13,26 +13,34 @@ import Data.Text hiding (map)
 import Types
 
 
-specToLatex (Equality e1 e2 _) = (eqnToLatex e2) `equiv` (eqnToLatex e2)
+class Output t where
+    toLatex :: (?name :: String) => t -> LaTeX
+    toString :: (?name :: String) => t -> String
 
-class EqnShow t where
-    eqnToLatex :: (?name :: String) => t -> LaTeX
-    eqnToString :: (?name :: String) => t -> String
+instance (Show a, Fractional a) => Output (Spec ds (t -> a)) where
+    toLatex (Equality e1 e2 _) = (toLatex e2) `equiv` (toLatex e2)
+    toString (Equality e1 e2 _) = toString e1 ++ "=" ++ toString e2
 
-instance (Show a, Fractional a) => EqnShow (Eqn ds (t -> a)) where
-    eqnToLatex (Delta n _ d) = ((delta ^: (fromInteger n)) <> (fromString ?name)) 
+instance (Show a, Fractional a) => Output (Eqn ds (t -> a)) where
+    toLatex (Delta n _ d) = ((delta ^: (fromInteger n)) <> (fromString ?name)) 
                            `frac` 
                            ((delta <> (fromString $ show d)) ^: (fromInteger n))
-    eqnToLatex (Times e1 e2) = (parensL $ eqnToLatex e1) * (parensL $ eqnToLatex e2)
-    eqnToLatex (Add e1 e2) = (eqnToLatex e1) + (eqnToLatex e2)
-    eqnToLatex (Add e1 e2) = (eqnToLatex e1) - (eqnToLatex e2)
-    eqnToLatex (Divide e1 e2) = (eqnToLatex e1) `frac` (eqnToLatex e2)
---eqnToLatex (Abs e1) = (eqnToLatex e1)
-    eqnToLatex (Constant e1) = (fromString $ show e1)
+    toLatex (Times e1 e2) = (parensL $ toLatex e1) * (parensL $ toLatex e2)
+    toLatex (Add e1 e2) = (toLatex e1) + (toLatex e2)
+    toLatex (Add e1 e2) = (toLatex e1) - (toLatex e2)
+    toLatex (Divide e1 e2) = (toLatex e1) `frac` (toLatex e2)
+    toLatex (Abs e1) = (fromString "|") <> (toLatex e1) <> (fromString "|")
+    toLatex (Constant e1) = (fromString $ show e1)
 
-
-
-
+    toString (Delta 1 _ d)  = "d " ++ ?name ++ " / " ++ "d " ++ (show d)
+    toString (Delta n _ d)  = "d^" ++ (show n) ++ " " ++ ?name ++ " / " 
+                           ++ "d " ++ (show d) ++ "^" ++ (show n)
+    toString (Times e1 e2)  = toString e1 ++ "*(" ++ toString e2 ++ ")"
+    toString (Add e1 e2)    = toString e1 ++ "+" ++ toString e2
+    toString (Minus e1 e2)  = toString e1 ++ "-" ++ toString e2
+    toString (Divide e1 e2) = toString e1 ++ " / " ++ toString e2
+    toString (Abs e1)       = "|" ++ toString e1 ++ "|"
+    toString (Constant e1)  = show e1
 
 juxtL t1 t2 = t1 <> (fromString " ") <> t2
 parensL t = (fromString "(") <> t <> (fromString ")")

@@ -8,6 +8,7 @@ import PDESpec
 
 spec alpha h = ((d h T) === (alpha * d2 h X))  `withDomain`   (X :. T :. Nil)
 
+
 impl alpha = 
          let
 
@@ -21,25 +22,31 @@ impl alpha =
 
          in arrayMemoFix ((0, 0), (?nx, ?nt)) h
 
+
+
  
 experiment = let ?dx = 0.05 in
              let ?dt = 0.05 in
              let ?nx = 40  in
-             let ?nt = 200  in
+             let ?nt = 20  in
+             let ?name = "h" in 
              let alpha = 0.006
-                 f = check (spec (Constant alpha) (impl alpha))
+                 spec' = spec (Constant alpha) (impl alpha)
+                 f = check spec'
                  outputFun (x, t) = putStrLn $ "x = " ++ (show x) ++ " t = " ++ (show t)
                                                ++ " results = " ++ (show $ f (x,t))
 
-                 figure = plot3d' 1 1 (0, ?nx) (0, ?nt) "x" "t" "heat" (curry (impl alpha))
-                 figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) "x" "t" axis xs
+                 figure = plot3d' 1 1 (0, ?nx) (0, ?nt) (show X) (show T) (?name) (curry (impl alpha))
+                 figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
 
                                                   
              in do dat <- mapM outputFun [(0,0)..(?nx-2,?nt-1)]
+                   putStrLn $ (toString $ lhs spec')
+                   putStrLn $ (toString $ rhs spec')
                    plotX11 figure
-                   plotX11 (figureEqn "dh/dt" (curry $ fst . f)) 
-                   plotX11 (figureEqn "alpha * d^2 h / dx^2" (curry $ snd . f)) 
-                   plotX11 (figureEqn "|diff|" (\x t -> (abs . uncurry (-)) . f $ (x, t) )) 
+                   plotX11 (figureEqn (toString $ lhs spec') (curry $ fst . f)) 
+                   plotX11 (figureEqn (toString $ rhs spec') (curry $ snd . f)) 
+                   plotX11 (figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t) )) 
 
 experimentCSV fname = let ?dx = 0.05 in
                       let ?dt = 0.05 in
