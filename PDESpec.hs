@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types, TypeOperators, MultiParamTypeClasses, ExistentialQuantification, GADTs, UndecidableInstances, ConstraintKinds, NoMonomorphismRestriction #-}
+{-# LANGUAGE Rank2Types, TypeOperators, MultiParamTypeClasses, ExistentialQuantification, GADTs, UndecidableInstances, ConstraintKinds, NoMonomorphismRestriction, ImplicitParams #-}
 
 module PDESpec(module Solvers, module Types, module PDESpec) where
 

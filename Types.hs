@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators, EmptyDataDecls, MultiParamTypeClasses, FlexibleInstances, OverlappingInstances, StandaloneDeriving, ConstraintKinds, TypeFamilies #-}
+{-# LANGUAGE GADTs, TypeOperators, EmptyDataDecls, MultiParamTypeClasses, FlexibleInstances, OverlappingInstances, StandaloneDeriving, ConstraintKinds, TypeFamilies, ImplicitParams #-}
 
 module Types where
 
