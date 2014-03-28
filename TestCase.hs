@@ -25,9 +25,14 @@ outputLatex = let implTex = let ?nx = mathit $ fromString "nx"
                                     (?nx, fromString "t"),
                                     (fromString "x", 0),
                                     (fromString "x", fromString "t")]
-                  --specTex = toLatex (spec (varconst "alpha") undefined) -- (implFast alpha))) 
-              in do doLatex implTex "heat-impl"
-                    --doLatex specTex "heat-model"
+                  specTex = let ?name = "h"
+                                ?dx = undefined
+                                ?dt = undefined
+                            in toLatex (spec (varconst "alpha") (undefined::(Int, Int) -> Float))
+              in doLatex (noindent <> fromString "Abstract specification : " <>
+                           equation specTex                    <> 
+                          fromString "Discrete approximation : " <>
+                           implTex) "heat"
 
 experiment = let ?dx = 0.05 
                  ?dt = 0.05 :: Float
