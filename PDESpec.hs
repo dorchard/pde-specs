@@ -77,3 +77,18 @@ instance (?dx :: Float, ?dt :: Float) => Check (X :. T :. Nil) (Int, Int) Float 
     checkEqn ds (Delta n impl dim) = (iterate (euler dim ds) impl) !! n
     checkEqn ds (Times e1 e2)      = \(x, t) -> checkEqn ds e1 (x, t) * checkEqn ds e2 (x, t)
     checkEqn ds (Add e1 e2)        = \(x, t) -> checkEqn ds e1 (x, t) + checkEqn ds e2 (x, t)
+
+data Model ds a where
+    Model :: Spec (Dimension ds) (Indices ds t -> a) -> (Indices ds t -> a) -> Model ds (Indices ds t -> a)
+
+buildModelInterface :: String -> Model ds a -> IO ()
+buildModelInterface name model = 
+    do putStrLn $ "Model interface for " ++ name 
+       putStrLn $ "What would you like to do? Options: "
+       putStrLn $ "\t\t validate: compare specification with implementation"
+       putStrLn $ "\t\t figure  : output figure with PDE and implementation results"
+       choice <- getLine
+       case choice of
+         "validate" -> return ()
+         "figure"   -> return ()
+       

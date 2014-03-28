@@ -6,8 +6,7 @@ import Debug.Trace
 import Plot
 import PDESpec
 
-spec h alpha = ((d h T) === (alpha * (d2 h X)))
-                  `withDomain` (X :. T :. Nil)
+spec alpha h = ((d h T) === (alpha * d2 h X))  `withDomain`   (X :. T :. Nil)
 
 impl alpha = 
          let
@@ -25,10 +24,10 @@ impl alpha =
  
 experiment = let ?dx = 0.05 in
              let ?dt = 0.05 in
-             let ?nx = 20  in
-             let ?nt = 100  in
+             let ?nx = 40  in
+             let ?nt = 500  in
              let alpha = 0.006
-                 f = check (spec (impl alpha) (Constant alpha))
+                 f = check (spec (Constant alpha) (impl alpha))
                  outputFun (x, t) = putStrLn $ "x = " ++ (show x) ++ " t = " ++ (show t)
                                                ++ " results = " ++ (show $ f (x,t))
 

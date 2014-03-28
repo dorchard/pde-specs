@@ -1,10 +1,12 @@
 {-# LANGUAGE GADTs, TypeOperators, EmptyDataDecls, MultiParamTypeClasses, FlexibleInstances, OverlappingInstances, StandaloneDeriving, ConstraintKinds, TypeFamilies, ImplicitParams #-}
 
+{- Declares various types that are used everywhere -}
+
 module Types where
 
 import GHC.Prim
 
--- data Dim = X | Y | Z | T deriving Show
+{- Type-level dimension information -}
 
 data X
 data Y
@@ -16,6 +18,8 @@ data Dim t where
     Y :: Dim Y
     Z :: Dim Z
     T :: Dim T
+
+{- Mapping from dimensions to their 'implicit parameter' requirements -}
 
 type family Delta t a :: Constraint
 type instance Delta X a = ?dx :: a
@@ -41,3 +45,12 @@ instance Show (Dimension t) where
 class Member t ts 
 instance Member t (t :. ts) 
 instance Member t ts => Member t (t' :. ts)
+
+{- Map type-level dimension lists to tuples #-}
+
+type family Indices ds t
+type instance Indices Nil t = ()
+type instance Indices (a :. Nil) t = (t)
+type instance Indices (a :. b :. Nil) t = (t, t)
+type instance Indices (a :. b :. c :. Nil) t = (t, t, t)
+type instance Indices (a :. b :. c :. d :. Nil) t = (t, t, t, t)
