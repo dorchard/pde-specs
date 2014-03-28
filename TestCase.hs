@@ -40,13 +40,14 @@ experiment = let ?dx = 0.05 in
                  figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
 
                                                   
-             in do dat <- mapM outputFun [(0,0)..(?nx-2,?nt-1)]
+             in do --dat <- mapM outputFun [(0,0)..(?nx-2,?nt-1)]
+                   doLatex  (toLatex spec') ?name
                    putStrLn $ (toString $ lhs spec')
                    putStrLn $ (toString $ rhs spec')
-                   plotX11 figure
-                   plotX11 (figureEqn (toString $ lhs spec') (curry $ fst . f)) 
-                   plotX11 (figureEqn (toString $ rhs spec') (curry $ snd . f)) 
-                   plotX11 (figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t) )) 
+                   --plotX11 figure
+                   --plotX11 (figureEqn (toString $ lhs spec') (curry $ fst . f)) 
+                   --plotX11 (figureEqn (toString $ rhs spec') (curry $ snd . f)) 
+                   --plotX11 (figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t) )) 
 
 experimentCSV fname = let ?dx = 0.05 in
                       let ?dt = 0.05 in

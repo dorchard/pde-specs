@@ -1,6 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances, GADTs, ImplicitParams #-}
 
-module Output (module Text.LaTeX.Packages.AMSMath, module Output) where
+module Output (module Text.LaTeX.Packages.AMSMath, 
+               module Text.LaTeX.Base.Render,
+               module Output) where
 
 {- (<>), fromString, LaTeX(..),alpha,deltau,fixLatex,fixLatexCases,doLatex,writeLatexFigure,mathit) where -}
 
@@ -17,15 +19,19 @@ class Output t where
     toLatex :: (?name :: String) => t -> LaTeX
     toString :: (?name :: String) => t -> String
 
-instance (Show a, Fractional a) => Output (Spec ds (t -> a)) where
-    toLatex (Equality e1 e2 _) = (toLatex e2) `equiv` (toLatex e2)
+instance (Show a) => Output (Spec ds (t -> a)) where
+    toLatex (Equality e1 e2 _) = (toLatex e1) `equiv` (toLatex e2)
     toString (Equality e1 e2 _) = toString e1 ++ "=" ++ toString e2
 
-instance (Show a, Fractional a) => Output (Eqn ds (t -> a)) where
+instance (Show a) => Output (Eqn ds (t -> a)) where
+    toLatex (Delta 1 _ d) = (delta <> (fromString ?name)) 
+                           `frac` 
+                           (delta <> (fromString $ show d))
+
     toLatex (Delta n _ d) = ((delta ^: (fromInteger n)) <> (fromString ?name)) 
                            `frac` 
                            ((delta <> (fromString $ show d)) ^: (fromInteger n))
-    toLatex (Times e1 e2) = (parensL $ toLatex e1) * (parensL $ toLatex e2)
+    toLatex (Times e1 e2) = (toLatex e1) * (parensL $ toLatex e2)
     toLatex (Add e1 e2) = (toLatex e1) + (toLatex e2)
     toLatex (Add e1 e2) = (toLatex e1) - (toLatex e2)
     toLatex (Divide e1 e2) = (toLatex e1) `frac` (toLatex e2)
@@ -66,7 +72,7 @@ fixLatexD recName delim f = \(x, y) -> delim ((fromString recName) ^: x !: y) (f
 fixLatexCases recName f cases = align $ map (fixLatexD recName (&) f) cases
 
 doLatex eqn name = renderFile (name ++ ".tex") (wrapped eqn)
-                    where wrapped eqn = (documentclass [] article) <> usepackage [] "amsmath" <> (document eqn) -- (equiv (mathit $ fromString name) eqn)))
+                    where wrapped eqn = (documentclass [] article) <> usepackage [] "amsmath" <> (document (align [eqn])) -- (equiv (mathit $ fromString name) eqn)))
 
 writeLatexFigure eqn figname name = 
        renderFile name ((documentclass [] article) 

@@ -70,9 +70,9 @@ data Eqn ds a where
     Minus :: Eqn ds a -> Eqn ds a -> Eqn ds a
     Divide :: Eqn ds a -> Eqn ds a -> Eqn ds a
     Abs :: Eqn ds a -> Eqn ds a
-    Constant :: ((Show a, Fractional a) => a) -> Eqn ds (t -> a)
+    Constant :: ((Show a) => a) -> Eqn ds (t -> a)
              
-instance (Show a, Fractional a) => Show (Eqn ds (t -> a)) where
+instance (Show a) => Show (Eqn ds (t -> a)) where
     show (Delta n _ dim) = "Delta " ++ (show n) ++ " " ++ (show dim) ++ " fun "
     show (Times e1 e2)   = "Times (" ++ show e1 ++ ") (" ++  show e2 ++ ")"
     show (Add e1 e2)     = "Add (" ++ show e1 ++ ") (" ++  show e2 ++ ")"
@@ -90,12 +90,12 @@ lhs, rhs :: Spec ds a -> Eqn ds a
 lhs (Equality l _ _) = l
 rhs (Equality _ r _) = r
 
-instance (Show a, Fractional a) => Show (Spec ds (t -> a)) where
+instance (Show a) => Show (Spec ds (t -> a)) where
     show (Equality eq1 eq2 d) = "Equality (" ++ (show eq1) ++ ") (" ++ (show eq2) ++ " " ++ show d
 
 {- Numerical classes -}
 
-instance Num (Eqn ds (t -> a)) where
+instance Num a => Num (Eqn ds (t -> a)) where
     a * b = Times a b
     a + b = Add a b
     a - b = Minus a b
@@ -103,5 +103,5 @@ instance Num (Eqn ds (t -> a)) where
     signum a = error "signum not implemented"
     fromInteger a = Constant (fromInteger a)
 
-instance Fractional (Eqn ds (t -> a)) where
+instance Fractional a => Fractional (Eqn ds (t -> a)) where
     fromRational x = Constant (fromRational x)
