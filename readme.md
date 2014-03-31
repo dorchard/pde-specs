@@ -24,7 +24,13 @@ Requires 'array-memoize' library:
 
 Then build via
 
-     	 ghc TestCase.hs -o testcase
+     	 ghc TestCaseCmd.hs -o testcase
+
+(this provides a command line interface to a test case -- see usage below)
+
+OR, you can using interactive mode with
+
+         ghci TestCase.hs
 
 Usage
 ---------------------------------------------
@@ -37,4 +43,4 @@ as follows:
 
 All components are necessary, e.g. 
 
-	./testcase 0.05 0.05 40 200 0.006
+	./testcase 0.05 0.05 40 50 0.006

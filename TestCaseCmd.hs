@@ -83,38 +83,41 @@ experimentCSV fname = let ?dx = 0.05 in
 
 
 main = do args <- getArgs
-          let ?dx = read $ args !! 0 :: Float
-              ?dt = read $ args !! 1 :: Float
-              ?nx = read $ args !! 2 :: Int
-              ?nt = read $ args !! 3 :: Int
-              ?name = "h"
-           in
-             let alpha = read $ args !! 4 :: Float
+          if (length args < 5) then 
+              putStrLn "usage:\n\t ./testcase [dx] [dt] [nx] [nt] [alpha]"
+          else
+            let ?dx = read $ args !! 0 :: Float
+                ?dt = read $ args !! 1 :: Float
+                ?nx = read $ args !! 2 :: Int
+                ?nt = read $ args !! 3 :: Int
+                ?name = "h"
+             in
+               let alpha = read $ args !! 4 :: Float
 
-                 spec' = spec (constant alpha) (implFast alpha)
-                 f     = check spec'
+                   spec' = spec (constant alpha) (implFast alpha)
+                   f     = check spec'
 
-                 figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
+                   figureEqn axis xs = plot3d' 1 1 (0, ?nx - 2) (0, ?nt - 1) (show X) (show T) axis xs
 
-                 heatImpl = plot3d' 1 1 (0, ?nx) (0, ?nt) (show X) (show T) (?name) (curry (implFast alpha))
-                 heatLHS = figureEqn (toString $ lhs spec') (curry $ fst . f)
-                 heatRHS = figureEqn (toString $ rhs spec') (curry $ snd . f)
-                 heatErr = figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t))
+                   heatImpl = plot3d' 1 1 (0, ?nx) (0, ?nt) (show X) (show T) (?name) (curry (implFast alpha))
+                   heatLHS = figureEqn (toString $ lhs spec') (curry $ fst . f)
+                   heatRHS = figureEqn (toString $ rhs spec') (curry $ snd . f)
+                   heatErr = figureEqn "|err|" (\x t -> (abs . uncurry (-)) . f $ (x, t))
                  
-                 outputRow (x, t) = [show x, show t, show . fst $ f (x, t), show . snd $ f (x, t)]
-                 csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
+                   outputRow (x, t) = [show x, show t, show . fst $ f (x, t), show . snd $ f (x, t)]
+                   csv = map outputRow [(0,0)..(?nx-2, ?nt-1)]
                                
-             in do putStrLn "data.csv"
-                   writeFile "data.csv" (printCSV csv)
-                   putStrLn "heatImpl.png"
-                   writePlotPNG heatImpl "heatImpl"
-                   putStrLn "heatLHS.png"
-                   writePlotPNG heatLHS  "heatLHS"
-                   putStrLn "heatRHS.png"
-                   writePlotPNG heatRHS  "heatRHS"
-                   putStrLn "heatErr.png"
-                   writePlotPNG heatErr  "heatErr"
-                   outputLatexSep
+               in do putStrLn "data.csv"
+                     writeFile "data.csv" (printCSV csv)
+                     putStrLn "heatImpl.png"
+                     writePlotPNG heatImpl "heatImpl"
+                     putStrLn "heatLHS.png"
+                     writePlotPNG heatLHS  "heatLHS"
+                     putStrLn "heatRHS.png"
+                     writePlotPNG heatRHS  "heatRHS"
+                     putStrLn "heatErr.png"
+                     writePlotPNG heatErr  "heatErr"
+                     outputLatexSep
 
 outputLatexSep = let implTex = let ?nx = mathit $ fromString "nx"
                                    ?dx = deltau <> (fromString "x")
