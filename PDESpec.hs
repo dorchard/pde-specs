@@ -19,10 +19,10 @@ import GHC.Arr
 
 {- Aliases to make writing specifications nicer -}
 
-infix 2 ===
+infixl 3 ===
 (===) = Equality
 
-infixr 3 `withDomain`
+infixr 2 `withDomain`
 withDomain = ($)
 d     = Delta 1
 d2    = Delta 2
